@@ -5,34 +5,38 @@ document.addEventListener('DOMContentLoaded', function() {
     let modeling = ""; // akan diisi secara dinamis
 
     // Load file hr.sql secara dinamis
-    fetch('hr.sql')
-        .then(response => response.text())
-        .then(sqlText => {
-            modeling = sqlText;
-        })
-        .catch(err => {
-            console.error("Gagal memuat file SQL:", err);
-            modeling = "";
-        });
+    fetch('modeling.php')
+    .then(response => response.text())
+    .then(sqlText => {
+        modeling = sqlText;
+    })
+    .catch(err => {
+        console.error("Gagal memuat file SQL:", err);
+        modeling = "";
+    });
 
-    const prompting = 'kamu adalah asisten yang sangat memahami mengenai pengolaan data dan sangat memahami data yang telah saya berikan sebelumnya.saya adalah orang yang ingin mengolah data tersebut. bantu saya menampilkan hanya hasil dari pertanyaan saya dalam bentuk tabel berformat HTML. berikut ini adalah pertanyaan saya:';
+    const prompting = 'kamu adalah asisten yang sangat memahami mengenai pengolaan data dan sangat memahami data yang telah saya berikan sebelumnya. hanya jawab pertanyaan yang berkorelasi dengan database tersebut, jika ada pertanyaan yang diluar konteks, ucapkan `Maaf, pertanyaan tersebut berada diluar konteks.`.saya adalah orang yang ingin mengolah data tersebut. jika query pertanyaan saya panjang (>30 kata) maka berikan query mysqlnya, tetapi jika query pertanyaan saya dibawah 30 kata maka bantu saya menampilkan hanya hasil dari pertanyaan saya dalam bentuk tabel berformat HTML. gunakan <b> untuk membuat teks menjadi bold. berikut ini adalah pertanyaan saya:';
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const userMsg = input.value.trim();
         if (!userMsg) return;
-        resultDiv.innerHTML = "Loading...";
+        
+        // Mengubah tampilan loading dengan animasi
+        resultDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loader"></span><p style="margin-top: 15px; color: #666;">Processing your request...</p></div>';
 
         try {
             const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer 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', 
+                    // API KEY
+                    'Authorization': 'Bearer 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', 
                     'HTTP-Referer': window.location.origin,
                     'X-Title': 'teoribima',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    // Model yang digunakan
                     model: 'deepseek/deepseek-r1-0528:free',
                     messages: [{ role: 'user', content: modeling + "\n" + prompting + "\n" + userMsg }]
                 })
@@ -45,6 +49,15 @@ document.addEventListener('DOMContentLoaded', function() {
             resultDiv.innerHTML = '<pre>' + botReply + '</pre>';
         } catch (error) {
             resultDiv.innerHTML = "Error: " + error.message;
+        }
+    });
+
+    // Add event listener for textarea
+    input.addEventListener('keydown', function(e) {
+        // Check if Enter was pressed without Shift key
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // Prevent default new line
+            form.dispatchEvent(new Event('submit')); // Trigger form submission
         }
     });
 });

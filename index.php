@@ -5,6 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Database Assistant</title>
+    <style>
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #2c3e50;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body style="background-color: #f5f5f5; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #333;">
